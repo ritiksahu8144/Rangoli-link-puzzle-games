@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rangoli Link – 10,000 Level Puzzle</title>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b1038">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* styles.css - layout, festival themes (Diwali, Holi, Pongal), buttons, dialog */
+:root{--bg1:#1b1038;--bg2:#44195f;--ink:#fff2dc;--mut:#c9b6e6;--acc:#ffb627;--accink:#2a1500;--pan:rgba(255,255,255,.08);--line:rgba(255,255,255,.2);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#1b1038}}
+body[data-w="1"]{--bg1:#fff0f8;--bg2:#e2f2ff;--ink:#2b1646;--mut:#6b5a86;--acc:#e6007e;--accink:#fff;--pan:rgba(255,255,255,.75);--line:rgba(43,22,70,.2)}
+body[data-w="2"]{--bg1:#10301c;--bg2:#2f5a2c;--ink:#fdf3cf;--mut:#b9d1a0;--acc:#ffd23f;--accink:#2a2000;--pan:rgba(255,255,255,.09);--line:rgba(255,255,255,.2)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;font:400 16px/1.5 Mukta,system-ui,sans-serif;transition:background .4s}
+.scr{max-width:640px;margin:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.scr[hidden]{display:none}
+h1{font:400 clamp(40px,11vw,64px)/1.05 "Yatra One",Mukta,serif;margin:18px 0 0;text-align:center}
+.sub{margin:0;color:var(--mut);text-align:center;max-width:34ch}
+button{font:600 15px Mukta,sans-serif;cursor:pointer;color:var(--ink);background:var(--pan);border:1px solid var(--line);border-radius:12px;padding:10px 16px}
+button:hover:not(:disabled){border-color:var(--acc)}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.pri{background:var(--acc);color:var(--accink);border-color:var(--acc);font-size:18px;padding:13px 26px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:var(--pan);font-size:14px}
+.how{background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:14px 18px;max-width:440px;font-size:14px}
+.how p{margin:4px 0}
+.top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px}
+.top b{font:400 19px "Yatra One",Mukta,serif;text-align:center;line-height:1.2}
+.top small{display:block;font:400 12px Mukta;color:var(--mut)}
+#board{touch-action:none;border-radius:16px;background:var(--pan);border:1px solid var(--line);cursor:pointer}
+.stat{color:var(--mut);font-size:14px;margin:0}
+.tip{font-size:14px;color:var(--ink);background:var(--pan);border-radius:10px;padding:8px 12px;margin:0;text-align:center}
+#lgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%}
+@media (min-width:480px){#lgrid{grid-template-columns:repeat(10,1fr);gap:6px}}
+#lgrid button{padding:6px 0;font-size:13px;border-radius:9px;position:relative;line-height:1.15}
+#lgrid button i{display:block;font-style:normal;font-size:9px;color:var(--acc);letter-spacing:1px;height:11px}
+#lgrid button.cur{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+#lgrid button.lock{opacity:.35}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--bg2);color:var(--ink);padding:24px 28px;text-align:center}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h2{font:400 30px "Yatra One",Mukta,serif;margin:0}
+.stars{font-size:40px;color:var(--acc);letter-spacing:6px;margin:6px 0}
+dialog .row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+</style>
+
+</head>
+<body data-w="0">
+
+<section class="scr" id="home">
+  <h1>रंगोली लिंक</h1>
+  <p class="sub">Rangoli Link. Join matching dots, never cross a line, and light up the rangoli.</p>
+  <div class="chips"><span class="chip">🪔 Diwali</span><span class="chip">🎨 Holi</span><span class="chip">🌾 Pongal</span></div>
+  <button class="pri" id="cont">Play level 1</button>
+  <button id="lvls">All levels</button>
+  <button class="mus" aria-label="Music on or off"></button>
+  <div class="how">
+    <p><b>How to play</b></p>
+    <p>Drag from a dot to the dot of the same colour.</p>
+    <p>Lines can’t cross. Dragging over another line cuts it.</p>
+    <p>Link every pair and fill every tile to win. Solve without hints for 3 stars. Finish a level to open the next one.</p>
+  </div>
+  <p class="stat" id="prog"></p>
+</section>
+
+<section class="scr" id="game" hidden>
+  <div class="top">
+    <button id="back" aria-label="Back to menu">←</button>
+    <b id="ttl"></b>
+    <span><button id="hint">Hint 5</button> <button id="reset" aria-label="Restart level">↺</button> <button class="mus" aria-label="Music on or off"></button></span>
+  </div>
+  <canvas id="board"></canvas>
+  <p class="stat" id="stat"></p>
+  <button class="pri" id="nxt" hidden>Next level →</button>
+  <p class="tip" id="tip" hidden>Drag from a dot to its match. Link every pair and fill every tile to win.</p>
+</section>
+
+<section class="scr" id="levels" hidden>
+  <div class="top"><button id="lback" aria-label="Back to menu">←</button><b id="ltt">Levels</b><span></span></div>
+  <div id="lgrid"></div>
+  <div class="top"><button id="prev">Previous 100</button><button id="jump">Go to current</button><button id="next">Next 100</button></div>
+</section>
+
+<dialog id="win">
+  <h2 id="wt">Shabaash!</h2>
+  <div class="stars" id="wst"></div>
+  <p class="stat" id="wm"></p>
+  <div class="row"><button id="wl">Levels</button><button class="pri" id="wn">Next level</button></div>
+</dialog>
+
+<script>
+/* core.js - helpers, festival themes, saved progress */
+const $=s=>document.querySelector(s),TOTAL=10000;
+const TH=[
+ {n:"Diwali",pal:["#ffb627","#ff5d73","#4ee1c1","#6ea8ff","#ff8a3d","#c77dff","#9bf06b","#ff7bd5","#f5f1a0","#5fd3f3"],tile:"rgba(255,255,255,.07)",bin:"rgba(255,230,160,.45)"},
+ {n:"Holi",pal:["#e6007e","#00a8e8","#e8b800","#6aa800","#8a2be2","#ff6a00","#00a082","#d63031","#2d3a8c","#f06292"],tile:"rgba(43,22,70,.07)",bin:"rgba(43,22,70,.3)"},
+ {n:"Pongal",pal:["#ffd23f","#ff7b00","#ef5b66","#a7e66e","#f4a261","#2ec4b6","#ff9ecd","#d08a4a","#8ecae6","#f7f0d0"],tile:"rgba(255,255,255,.07)",bin:"rgba(255,240,180,.4)"}];
+const world=n=>Math.floor((n-1)/25)%3;
+
+let S={c:0,st:"",h:5,m:1};
+try{const j=JSON.parse(localStorage.getItem("rl1")||"null");if(j&&typeof j.c==="number")S=Object.assign(S,j)}catch(e){}
+const save=()=>{try{localStorage.setItem("rl1",JSON.stringify(S))}catch(e){}};
+const starOf=n=>+S.st[n-1]||0;
+
+
+/* levels.js - seeded level generator and difficulty ramp (10,000 levels) */
+/* ---------- level generator: seeded, every level has a guaranteed solution ---------- */
+function mk(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const TIERS=[1,4,12,30,70,150],LB=["Hard","Very hard","Expert","Expert","Master","Grandmaster"];
+const tierOf=n=>{let t=0;while(t<5&&n>=TIERS[t+1])t++;return t};
+const sizeOf=n=>5+tierOf(n);
+function one(n,s,tgt,sd,strict){
+  const N=s*s;
+  const nb=c=>{const x=c%s,y=c/s|0,o=[];if(x>0)o.push(c-1);if(x<s-1)o.push(c+1);if(y>0)o.push(c-s);if(y<s-1)o.push(c+s);return o};
+  const adj=(a,b)=>nb(a).includes(b);
+  for(let a=0;a<(strict?120:300);a++){
+    const r=mk(n*7919+(sd*997+a)*104729+17),own=new Int16Array(N).fill(-1),paths=[];
+    const maxL=Math.ceil(N/tgt)+Math.floor(r()*2);
+    const ord=[...Array(N).keys()].sort(()=>r()-.5);
+    for(const c0 of ord){
+      if(own[c0]>=0)continue;const p=[c0];own[c0]=paths.length;
+      while(p.length<maxL){const f=nb(p[p.length-1]).filter(q=>own[q]<0);if(!f.length)break;const q=f[Math.floor(r()*f.length)];own[q]=paths.length;p.push(q)}
+      paths.push(p);
+    }
+    let ok=true;
+    for(;;){
+      const i=paths.findIndex(p=>p.length<3);if(i<0)break;
+      const p=paths[i];let m=false;
+      outer:for(let j=0;j<paths.length;j++){
+        if(j===i)continue;const q=paths[j];
+        for(const qi of [0,q.length-1])for(const pi of [0,p.length-1])
+          if(adj(q[qi],p[pi])){const qq=qi===0?q.slice().reverse():q,pp=pi===0?p:p.slice().reverse();paths[j]=qq.concat(pp);paths.splice(i,1);m=true;break outer}
+      }
+      if(!m){ok=false;break}
+    }
+    if(ok&&paths.length>=2&&paths.length<=10&&(!strict||(paths.length>=tgt-2&&paths.length<=tgt+2)))return paths;
+  }
+  return null;
+}
+
+/* ---------- difficulty: grows with every level ---------- */
+function gen(n){
+  const t=tierOf(n),s=5+t,len=t<5?TIERS[t+1]-TIERS[t]:2000,pr=Math.min(1,(n-TIERS[t])/len);
+  const tgt=Math.min(10,s-1+Math.floor(pr*3)),k=3+Math.floor(pr*11);
+  const score=p=>p.reduce((a,q)=>{let tn=0;for(let i=2;i<q.length;i++)if(q[i]-q[i-1]!==q[i-1]-q[i-2])tn++;const m=Math.abs(q[0]%s-q[q.length-1]%s)+Math.abs((q[0]/s|0)-(q[q.length-1]/s|0));return a+(q.length-1-m)+tn*.5},0);
+  let best=null,bs=-1;
+  for(let i=0;i<k;i++){const p=one(n,s,tgt,i,true)||one(n,s,tgt,i,false);if(!p)continue;const sc=score(p);if(sc>bs){bs=sc;best=p}}
+  return{s,sol:best||Array.from({length:s},(_,y)=>Array.from({length:s},(_,x)=>y*s+x))};
+}
+
+
+/* audio.js - synthesised background music and sound effects */
+/* ---------- background music (synthesised, no files) ---------- */
+let AC=null,mg=null,tm=0,nt=0,di=2,dr=null,mw=0;
+const SC=[0,2,4,7,9],MU=[{r:130.81,b:.6},{r:146.83,b:.44},{r:123.47,b:.54}];
+const fq=d=>MU[mw].r*2*Math.pow(2,(SC[d%5]+12*Math.floor(d/5))/12);
+let rv=null,st=0,mot=[],nz=null;
+const MB=[92,104,84],CH=[[0,4,7],[-3,0,4],[2,7,9],[-5,2,7]];
+function mkReverb(){const n=AC.sampleRate*2.2|0,b=AC.createBuffer(2,n,AC.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.6)}const cn=AC.createConvolver();cn.buffer=b;return cn}
+function mkAudio(){
+  AC=new (window.AudioContext||window.webkitAudioContext)();
+  mg=AC.createGain();mg.gain.value=.22;
+  rv=mkReverb();const wet=AC.createGain();wet.gain.value=.45;
+  mg.connect(AC.destination);mg.connect(rv);rv.connect(wet);wet.connect(AC.destination);
+  nz=AC.createBuffer(1,AC.sampleRate*.1|0,AC.sampleRate);const nd=nz.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+}
+function tone(t,f,dur,v,type,att){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+att);g.gain.setTargetAtTime(.0001,t+dur*.6,dur*.25);o.connect(g);g.connect(mg);o.start(t);o.stop(t+dur+.6);return o}
+function flute(t,f,dur){const o=tone(t,f,dur,.15,"sine",.06);tone(t,f*2,dur,.03,"sine",.06);const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=5.2;lg.gain.value=f*.006;l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+dur+.6)}
+function kick(t){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(48,t+.2);g.gain.setValueAtTime(.42,t);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.connect(g);g.connect(mg);o.start(t);o.stop(t+.3)}
+function tick(t,v){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=nz;f.type="highpass";f.frequency.value=4000;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.06);s.connect(f);f.connect(g);g.connect(mg);s.start(t)}
+function pluck(t,f,v){const o=AC.createOscillator(),g=AC.createGain();o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g);g.connect(mg);o.start(t);o.stop(t+1.7)}
+function sched(){
+  const sd=30/MB[mw];
+  while(nt<AC.currentTime+.8){
+    const p=st%8,bar=Math.floor(st/8)%4,ch=CH[bar],r=MU[mw].r;
+    if(st%32===0){let d=4;mot=Array.from({length:8},()=>{if(Math.random()<.2)return -1;d=Math.max(2,Math.min(9,d+[-2,-1,-1,1,1,2][Math.floor(Math.random()*6)]));return d})}
+    if(p===0)ch.forEach(o=>tone(nt,r*Math.pow(2,o/12),sd*8+.4,.045,"sine",.7));
+    if(p===0||p===4)tone(nt,r/2*Math.pow(2,ch[0]/12),sd*3,.26,"sine",.02);
+    if(p===0||p===5)kick(nt);
+    const tv=[0,0,.1,0,.07,0,.1,.06][p];if(tv)tick(nt,tv);
+    const m=mot[p];if(m>=0)flute(nt,fq(Math.min(9,m+[0,1,0,-1][bar])),sd*(p%2?1.6:2.4));
+    nt+=sd;st++;
+  }
+}
+function musicOn(){if(!S.m)return;try{if(!AC)mkAudio();AC.resume();if(!tm){nt=AC.currentTime+.1;st=0;tm=setInterval(sched,200)}}catch(e){}}
+function musicOff(){if(tm){clearInterval(tm);tm=0}if(AC)AC.suspend().catch(()=>{})}
+function setMusic(w){mw=w;if(dr){const t=AC.currentTime;[1,1.5,2].forEach((m,i)=>dr[i].frequency.setTargetAtTime(MU[w].r*m/2,t,.8))}}
+function chime(){if(!S.m||!AC)return;[0,2,4,7].forEach((d,i)=>pluck(AC.currentTime+i*.12,fq(d+5),.22))}
+function updateMus(){document.querySelectorAll(".mus").forEach(b=>b.textContent=S.m?"♪ On":"♪ Off")}
+
+
+/* game.js - board, input, rules, screens and startup */
+/* ---------- game state ---------- */
+const cv=$("#board"),ctx=cv.getContext("2d");
+let L=null,P=[],dots=[],act=-1,won=false,B=300,dpr=1,curN=1,hu=0;
+const dotColor=c=>dots.findIndex(d=>d[0]===c||d[1]===c);
+const owner=c=>P.findIndex(p=>p.includes(c));
+const isDone=k=>{const p=P[k];return p.length>1&&dotColor(p[p.length-1])===k&&p[p.length-1]!==p[0]};
+
+function startLevel(n){
+  curN=n;L=gen(n);dots=L.sol.map(p=>[p[0],p[p.length-1]]);P=dots.map(()=>[]);act=-1;won=false;hu=0;$("#nxt").hidden=true;
+  document.body.dataset.w=world(n);setMusic(world(n));
+  $("#ttl").innerHTML=`Level ${n.toLocaleString("en-IN")}<small>${TH[world(n)].n} · ${L.s}×${L.s} · ${LB[L.s-5]}</small>`;
+  $("#tip").hidden=n>2;show("game");layout();
+}
+function layout(){
+  if(!L)return;B=Math.floor(Math.min(innerWidth-32,innerHeight-230,560));B=Math.max(B,220);
+  dpr=window.devicePixelRatio||1;cv.width=B*dpr;cv.height=B*dpr;cv.style.width=cv.style.height=B+"px";draw();
+}
+function draw(){
+  if(!L)return;const s=L.s,cs=B/s,T=TH[world(curN)];
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,B,B);
+  const own=new Array(s*s).fill(-1);P.forEach((p,k)=>p.forEach(c=>own[c]=k));
+  for(let c=0;c<s*s;c++){
+    const x=(c%s)*cs,y=(c/s|0)*cs,k=own[c];
+    ctx.fillStyle=k>=0?T.pal[k]+"38":T.tile;
+    ctx.beginPath();(ctx.roundRect?ctx.roundRect(x+2,y+2,cs-4,cs-4,cs*.18):ctx.rect(x+2,y+2,cs-4,cs-4));ctx.fill();
+    if(k<0&&dots.every((_,j)=>isDone(j))){ctx.strokeStyle=T.pal[0];ctx.lineWidth=2;ctx.strokeRect(x+4,y+4,cs-8,cs-8)}
+    if(k<0){ctx.fillStyle=T.bin;ctx.beginPath();ctx.arc(x+cs/2,y+cs/2,cs*.055,0,7);ctx.fill()}
+  }
+  const ct=c=>[(c%s+.5)*cs,((c/s|0)+.5)*cs];
+  ctx.lineCap=ctx.lineJoin="round";ctx.lineWidth=cs*.34;
+  P.forEach((p,k)=>{if(p.length<2)return;ctx.strokeStyle=T.pal[k];ctx.beginPath();p.forEach((c,i)=>{const[x,y]=ct(c);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()});
+  dots.forEach((d,k)=>d.forEach(c=>{
+    const[x,y]=ct(c),col=T.pal[k];
+    ctx.shadowColor=col;ctx.shadowBlur=cs*.28;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,cs*.3,0,7);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(255,255,255,.55)";ctx.beginPath();ctx.arc(x,y,cs*.12,0,7);ctx.fill();
+    if(isDone(k)){ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,cs*.4,0,7);ctx.stroke();ctx.lineWidth=cs*.34}
+  }));
+  const dn=dots.filter((_,k)=>isDone(k)).length,fl=own.filter(k=>k>=0).length;
+  $("#stat").textContent=`Linked ${dn}/${dots.length} · Filled ${Math.round(fl/(s*s)*100)}%`;
+  $("#hint").textContent="Hint "+S.h;$("#hint").disabled=S.h<=0||won;
+}
+function cellAt(e){const r=cv.getBoundingClientRect(),s=L.s;return Math.min(s-1,Math.max(0,Math.floor((e.clientY-r.top)/r.height*s)))*s+Math.min(s-1,Math.max(0,Math.floor((e.clientX-r.left)/r.width*s)))}
+function step(k,c){
+  const p=P[k],i=p.indexOf(c);
+  if(i>=0){P[k]=p.slice(0,i+1);return true}
+  const d=dotColor(c);if(d>=0&&d!==k)return false;
+  if(isDone(k))return false;
+  const o=owner(c);if(o>=0&&o!==k)P[o]=P[o].slice(0,P[o].indexOf(c));
+  p.push(c);return true;
+}
+cv.addEventListener("pointerdown",e=>{
+  if(!L||won)return;e.preventDefault();cv.setPointerCapture(e.pointerId);
+  const c=cellAt(e),d=dotColor(c);
+  if(d>=0){P[d]=[c];act=d}
+  else{const o=owner(c);if(o<0)return;P[o]=P[o].slice(0,P[o].indexOf(c)+1);act=o}
+  draw();
+});
+cv.addEventListener("pointermove",e=>{
+  if(act<0)return;const t=cellAt(e),s=L.s;let g=0;
+  while(g++<12){
+    const cur=P[act][P[act].length-1];if(cur===t)break;
+    const cx=cur%s,cy=cur/s|0,tx=t%s,ty=t/s|0;let nx=cx,ny=cy;
+    if(Math.abs(tx-cx)>=Math.abs(ty-cy))nx+=Math.sign(tx-cx);else ny+=Math.sign(ty-cy);
+    if(!step(act,ny*s+nx))break;
+  }
+  draw();
+});
+const end=()=>{if(act<0)return;act=-1;draw();check()};
+cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+
+function check(){
+  if(won||!dots.every((_,k)=>isDone(k)))return;
+  const s0=L.s;if(new Set(P.flat()).size!==s0*s0){$("#stat").textContent="All linked! Now fill every tile to finish.";return}won=true;draw();
+  const s=L.s,filled=new Set(P.flat()).size===s*s,stars=hu?2:3;
+  const first=curN===S.c+1;
+  if(first){S.c=curN;S.h=Math.min(9,S.h+1)}
+  S.st=S.st.padEnd(curN,"0");S.st=S.st.slice(0,curN-1)+Math.max(starOf(curN),stars)+S.st.slice(curN);
+  save();try{chime()}catch(e){}try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}
+  $("#wst").textContent="★".repeat(stars)+"☆".repeat(3-stars);
+  $("#wt").textContent=curN>=TOTAL?"Sab 10,000 levels poore!":filled?"Perfect!":"Shabaash!";
+  $("#wm").textContent=(hu?"You used a hint, so 2 stars.":"No hints used. Full 3 stars!")+(curN<TOTAL?" The next level is harder.":"");
+  $("#wn").style.display=curN>=TOTAL?"none":"";
+  $("#nxt").hidden=curN>=TOTAL;setTimeout(()=>{try{$("#win").showModal()}catch(e){}},350);
+}
+$("#reset").onclick=()=>{if(won)return;P=dots.map(()=>[]);draw()};
+$("#hint").onclick=()=>{
+  if(S.h<=0||won)return;const k=dots.findIndex((_,i)=>!isDone(i));if(k<0)return;
+  const sol=L.sol[k];P[k]=sol.slice();
+  P.forEach((p,j)=>{if(j===k)return;const i=p.findIndex((c,ix)=>ix>0&&sol.includes(c));if(i>0)P[j]=p.slice(0,i)});
+  S.h--;hu=1;save();draw();check();
+};
+$("#wn").onclick=()=>{$("#win").close();startLevel(curN+1)};
+$("#wl").onclick=()=>{$("#win").close();openLevels()};
+$("#nxt").onclick=()=>startLevel(curN+1);
+
+/* ---------- screens ---------- */
+function show(id){["home","game","levels"].forEach(s=>$("#"+s).hidden=s!==id)}
+function home(){document.body.dataset.w=world(Math.min(S.c+1,TOTAL));const n=Math.min(S.c+1,TOTAL);
+  $("#cont").textContent=S.c?`Continue · Level ${n.toLocaleString("en-IN")}`:"Play level 1";
+  $("#prog").textContent=`${S.c.toLocaleString("en-IN")} of 10,000 levels completed`;show("home")}
+let pg=0;
+function openLevels(){pg=Math.floor(Math.min(S.c,TOTAL-1)/100);renderLevels();show("levels")}
+function renderLevels(){
+  const g=$("#lgrid"),f=document.createDocumentFragment();
+  for(let i=1;i<=100;i++){
+    const n=pg*100+i,b=document.createElement("button"),locked=n>S.c+1,s=starOf(n);
+    b.dataset.n=n;b.className=locked?"lock":n===S.c+1?"cur":"";b.disabled=locked;b.setAttribute("aria-label","Level "+n+(locked?" locked":""));
+    b.innerHTML=locked?"🔒<i></i>":`${n}<i>${"★".repeat(s)}</i>`;f.append(b);
+  }
+  g.replaceChildren(f);
+  $("#ltt").textContent=`Levels ${pg*100+1}–${pg*100+100}`;
+  $("#prev").disabled=pg===0;$("#next").disabled=pg>=TOTAL/100-1;
+}
+$("#lgrid").onclick=e=>{const b=e.target.closest("button");if(b&&!b.disabled)startLevel(+b.dataset.n)};
+$("#prev").onclick=()=>{pg--;renderLevels()};$("#next").onclick=()=>{pg++;renderLevels()};
+$("#jump").onclick=()=>{pg=Math.floor(Math.min(S.c,TOTAL-1)/100);renderLevels()};
+$("#cont").onclick=()=>startLevel(Math.min(S.c+1,TOTAL));
+$("#lvls").onclick=openLevels;$("#lback").onclick=home;$("#back").onclick=home;
+addEventListener("resize",layout);
+["click","pointerup","keydown"].forEach(t=>document.addEventListener(t,musicOn));
+document.addEventListener("visibilitychange",()=>{if(!AC)return;if(document.hidden)AC.suspend().catch(()=>{});else if(S.m)AC.resume().catch(()=>{})});
+document.querySelectorAll(".mus").forEach(b=>b.onclick=()=>{S.m=S.m?0:1;save();updateMus();S.m?musicOn():musicOff()});
+updateMus();
+home();
+
+</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+
+</body>
+</html>
